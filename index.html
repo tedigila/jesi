@@ -12,7 +12,7 @@
     justify-content: center;
     align-items: center;
     background-color: #1a1512;
-    background-image: url('chestroom.jpg');
+    background-image: url('BG.jpe');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -182,13 +182,13 @@
 <body>
 
   <div class="scene">
-    <img id="chest" src="closedchest.png" alt="Treasure Chest" class="chest-img">
-    <img id="closedScroll" src="closedscroll.png" alt="Closed Scroll" class="closed-scroll">
+    <img id="chest" src="CLOSED.jpe" alt="Treasure Chest" class="chest-img">
+    <img id="closedScroll" src="LROL.jpe" alt="Closed Scroll" class="closed-scroll">
   </div>
 
   <div id="scrollModal" class="scroll-modal">
     <div class="scroll-wrapper">
-      <img src="openedscroll.png" alt="Opened Scroll" class="opened-scroll-img">
+      <img src="LETTER.jpe" alt="Opened Scroll" class="opened-scroll-img">
 
       <!-- Left & Right Page Flip Arrows -->
       <button id="prevBtn" class="nav-arrow prev-arrow" title="Previous Page">&#8592;</button>
@@ -269,12 +269,12 @@
       console.log("Audio block/error:", err);
     });
 
-    chest.src = 'openingchest.png';
+    chest.src = 'OPEN.jpe';
     chest.style.cursor = 'default';
     chest.style.transform = 'none';
 
     setTimeout(() => {
-      chest.src = 'openedchest.png';
+      chest.src = 'OPENN.jpe';
       closedScroll.style.display = 'block';
     }, 1000);
   });
