@@ -23,43 +23,99 @@
   .scene {
     position: relative;
     width: 280px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 330px;
     margin-top: 140px;
     z-index: 2;
   }
 
-  .chest-img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    display: block;
+  /* Stacked chest layers so they can crossfade smoothly */
+  .chest-stack {
+    position: absolute;
+    inset: 0;
     cursor: pointer;
-    transition: transform 0.2s ease;
-    user-select: none;
-    filter: drop-shadow(0 12px 15px rgba(0, 0, 0, 0.85));
+    transition: transform 0.3s ease;
   }
 
-  .chest-img:hover {
-    transform: scale(1.04);
+  .chest-stack:hover { transform: scale(1.04); }
+
+  .chest-stack.opened { cursor: default; }
+  .chest-stack.opened:hover { transform: none; }
+
+  .chest-stack.shake { animation: chestShake 0.45s ease; }
+
+  @keyframes chestShake {
+    0%, 100% { transform: rotate(0) scale(1.04); }
+    20% { transform: rotate(-2.5deg) scale(1.04); }
+    40% { transform: rotate(2.5deg) scale(1.04); }
+    60% { transform: rotate(-1.5deg) scale(1.04); }
+    80% { transform: rotate(1deg) scale(1.04); }
+  }
+
+  .chest-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    opacity: 0;
+    transition: opacity 0.7s ease-in-out;
+    filter: drop-shadow(0 12px 15px rgba(0, 0, 0, 0.85));
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+
+  .chest-layer.show { opacity: 1; }
+  #layerGlow { transition-duration: 1s; }
+
+  /* Soft golden light that fades in when the chest is fully open */
+  .chest-glow {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    width: 360px;
+    height: 360px;
+    transform: translate(-50%, -50%) scale(0.6);
+    background: radial-gradient(circle, rgba(255, 210, 90, 0.55) 0%, rgba(255, 170, 40, 0.2) 40%, rgba(255, 170, 40, 0) 70%);
+    opacity: 0;
+    transition: opacity 1s ease, transform 1.2s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .chest-glow.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 
   .closed-scroll {
     position: absolute;
     width: 130px;
-    top: 34%;
+    top: 12%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 70px) scale(0.5);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
     cursor: pointer;
-    display: none;
     z-index: 5;
-    transition: transform 0.2s ease;
+    transition: transform 1s cubic-bezier(0.2, 0.9, 0.3, 1.15), opacity 0.7s ease, visibility 0s linear 1s;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.8));
+    -webkit-user-drag: none;
   }
 
-  .closed-scroll:hover {
-    transform: translateX(-50%) scale(1.1);
+  .closed-scroll.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 0) scale(1);
+    transition: transform 1s cubic-bezier(0.2, 0.9, 0.3, 1.15), opacity 0.7s ease, visibility 0s;
+  }
+
+  .closed-scroll.show:hover {
+    transform: translate(-50%, -4px) scale(1.1);
+    transition: transform 0.25s ease;
   }
 
   /* --- OPENED SCROLL MODAL OVERLAY --- */
@@ -70,10 +126,28 @@
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.8);
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+  }
+
+  .scroll-modal.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease, visibility 0s;
+  }
+
+  .scroll-modal .scroll-wrapper {
+    transform: scale(0.85) translateY(20px);
+    transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+
+  .scroll-modal.open .scroll-wrapper {
+    transform: scale(1) translateY(0);
   }
 
   .scroll-wrapper {
@@ -182,13 +256,18 @@
 <body>
 
   <div class="scene">
-    <img id="chest" src="CLOSED.jpe" alt="Treasure Chest" class="chest-img">
-    <img id="closedScroll" src="LROL.jpe" alt="Closed Scroll" class="closed-scroll">
+    <div class="chest-glow" id="chestGlow"></div>
+    <div id="chest" class="chest-stack">
+      <img id="layerClosed" class="chest-layer show" src="8c808640-5e3e-4cb7-9e15-970641e6ef5a.png" alt="Treasure Chest" draggable="false">
+      <img id="layerOpen" class="chest-layer" src="218b8616-3679-413c-a950-2e6af4ca98a1.png" alt="" draggable="false">
+      <img id="layerGlow" class="chest-layer" src="e95f0748-4c16-4911-9221-447daacb8d4a.png" alt="" draggable="false">
+    </div>
+    <img id="closedScroll" src="460e0a5d-ce9e-41e0-a62c-dfa42022d7a8.png" alt="Closed Scroll" class="closed-scroll" draggable="false">
   </div>
 
   <div id="scrollModal" class="scroll-modal">
     <div class="scroll-wrapper">
-      <img src="LETTER.jpe" alt="Opened Scroll" class="opened-scroll-img">
+      <img src="a2cb82a9-e7eb-4272-91ef-403bbc769777.png" alt="Opened Scroll" class="opened-scroll-img">
 
       <!-- Left & Right Page Flip Arrows -->
       <button id="prevBtn" class="nav-arrow prev-arrow" title="Previous Page">&#8592;</button>
@@ -220,6 +299,10 @@
 
 <script>
   const chest = document.getElementById('chest');
+  const layerClosed = document.getElementById('layerClosed');
+  const layerOpen = document.getElementById('layerOpen');
+  const layerGlow = document.getElementById('layerGlow');
+  const chestGlow = document.getElementById('chestGlow');
   const closedScroll = document.getElementById('closedScroll');
   const scrollModal = document.getElementById('scrollModal');
   const chestAudio = document.getElementById('chestAudio');
@@ -263,30 +346,43 @@
   chest.addEventListener('click', () => {
     if (isOpened) return;
     isOpened = true;
+    chest.classList.add('opened');
 
     chestAudio.currentTime = 0;
     chestAudio.play().catch(err => {
       console.log("Audio block/error:", err);
     });
 
-    chest.src = 'OPEN.jpe';
-    chest.style.cursor = 'default';
-    chest.style.transform = 'none';
+    // 1) little shake
+    chest.classList.add('shake');
 
+    // 2) closed -> open (crossfade)
     setTimeout(() => {
-      chest.src = 'OPENN.jpe';
-      closedScroll.style.display = 'block';
-    }, 1000);
+      chest.classList.remove('shake');
+      layerOpen.classList.add('show');
+      layerClosed.classList.remove('show');
+    }, 450);
+
+    // 3) open -> glowing (crossfade) + golden light
+    setTimeout(() => {
+      layerGlow.classList.add('show');
+      chestGlow.classList.add('show');
+    }, 1100);
+
+    // 4) scroll rises out of the chest
+    setTimeout(() => {
+      closedScroll.classList.add('show');
+    }, 1700);
   });
 
   closedScroll.addEventListener('click', () => {
     updatePage(1);
-    scrollModal.style.display = 'flex';
+    scrollModal.classList.add('open');
   });
 
   scrollModal.addEventListener('click', (e) => {
     if (e.target === scrollModal) {
-      scrollModal.style.display = 'none';
+      scrollModal.classList.remove('open');
     }
   });
 </script>
