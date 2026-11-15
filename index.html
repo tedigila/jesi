@@ -8,6 +8,7 @@
   body {
     margin: 0;
     height: 100vh;
+    height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,9 +23,9 @@
 
   .scene {
     position: relative;
-    width: 280px;
-    height: 330px;
-    margin-top: 140px;
+    width: clamp(230px, 62vw, 340px);
+    aspect-ratio: 280 / 330;
+    margin-top: 6vh;
     z-index: 2;
   }
 
@@ -64,9 +65,9 @@
 
   /* Each image has different padding, so these sizes/offsets line the
      chests up exactly on top of each other (no "double chest" while fading) */
-  #layerClosed { width: 301px; left: -14.5px; top: 72.6px; }
-  #layerOpen   { width: 311.9px; left: -12.9px; top: -2.5px; }
-  #layerGlow   { width: 326.1px; left: -28.6px; top: -23.9px; }
+  #layerClosed { width: 107.5%; left: -5.18%; top: 22%; }
+  #layerOpen   { width: 111.4%; left: -4.61%; top: -0.76%; }
+  #layerGlow   { width: 116.5%; left: -10.2%; top: -7.24%; }
 
   .chest-layer.show { opacity: 1; }
   #layerGlow { transition-duration: 0.8s; }
@@ -76,8 +77,8 @@
     position: absolute;
     left: 50%;
     top: 30%;
-    width: 360px;
-    height: 360px;
+    width: 130%;
+    aspect-ratio: 1;
     transform: translate(-50%, -50%) scale(0.6);
     background: radial-gradient(circle, rgba(255, 210, 90, 0.55) 0%, rgba(255, 170, 40, 0.2) 40%, rgba(255, 170, 40, 0) 70%);
     opacity: 0;
@@ -93,7 +94,7 @@
 
   .closed-scroll {
     position: absolute;
-    width: 130px;
+    width: 46%;
     top: 12%;
     left: 50%;
     transform: translate(-50%, 70px) scale(0.5);
@@ -127,6 +128,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
@@ -154,64 +156,54 @@
 
   .scroll-wrapper {
     position: relative;
-    width: 600px;
-    max-width: 92vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    aspect-ratio: 261 / 367;
+    width: min(92vw, calc(88dvh * 261 / 367), 520px);
+    container-type: inline-size;
   }
 
+  /* The PNG has transparent padding, so it is cropped to the scroll itself */
   .opened-scroll-img {
-    width: 100%;
+    position: absolute;
+    width: 137.5%;
+    max-width: none;
     height: auto;
-    border-radius: 8px;
+    left: -16.86%;
+    top: -14.71%;
     display: block;
     filter: drop-shadow(0 15px 35px rgba(0,0,0,0.9));
+    -webkit-user-drag: none;
   }
 
-  /* --- LETTER TEXT AREA (Strictly inside the flat parchment bounds) --- */
+  /* Letter text sits inside the flat parchment; everything scales with the scroll */
   .scroll-content {
     position: absolute;
-    top: 22%;
-    bottom: 22%;
-    left: 24%; /* Pushed inward so it never hits the left scroll curl */
-    right: 24%; /* Pushed inward so it never hits the right scroll curl */
+    top: 16.5%;
+    bottom: 15.5%;
+    left: 14%;
+    right: 14%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     color: #2c180b;
-    font-size: clamp(9px, 1.5vw, 12px); /* Smaller, crisp, readable font size */
+    font-size: 2.9cqw;
     line-height: 1.35;
     text-align: left;
+    overflow: hidden;
   }
 
-  .page {
-    display: none;
-    animation: pageFade 0.35s ease;
-  }
-
-  .page.active {
-    display: block;
-  }
-
-  .page p {
-    margin: 0 0 6px 0;
-  }
-
-  .signature {
-    margin-top: 6px;
-    font-weight: bold;
-  }
+  .page { display: none; animation: pageFade 0.35s ease; }
+  .page.active { display: block; flex: 1; min-height: 0; overflow-y: auto; }
+  .page p { margin: 0 0 1.3cqw 0; }
+  .signature { margin-top: 1.3cqw; font-weight: bold; }
 
   .page-indicator {
     text-align: center;
-    font-size: 11px;
+    font-size: 2.6cqw;
     font-style: italic;
     color: #5c3a21;
-    margin-top: 2px;
   }
 
-  /* --- ARROW NAVIGATION BUTTONS --- */
+  /* --- ARROW NAVIGATION BUTTONS (kept inside the scroll so they never go off-screen) --- */
   .nav-arrow {
     position: absolute;
     top: 50%;
@@ -219,19 +211,23 @@
     background: rgba(59, 35, 19, 0.85);
     color: #f4e4bc;
     border: 2px solid #c59b27;
-    width: 38px;
-    height: 38px;
+    width: 8cqw;
+    height: 8cqw;
+    min-width: 30px;
+    min-height: 30px;
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 4.5cqw;
     font-weight: bold;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.2s ease;
+    padding: 0;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
     z-index: 10;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .nav-arrow:hover {
@@ -240,14 +236,8 @@
     transform: translateY(-50%) scale(1.1);
   }
 
-  .prev-arrow {
-    left: -16px;
-    display: none;
-  }
-
-  .next-arrow {
-    right: -16px;
-  }
+  .prev-arrow { left: -2%; display: none; }
+  .next-arrow { right: -2%; }
 
   @keyframes pageFade {
     from { opacity: 0; transform: translateX(6px); }
