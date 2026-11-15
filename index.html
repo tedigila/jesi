@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Electronic Card</title>
+<title>Treasure Chest & Scroll Reveal</title>
 <style>
   body {
     margin: 0;
@@ -53,11 +53,7 @@
 
   .chest-layer {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center bottom;
+    max-width: none;
     opacity: 0;
     transition: opacity 0.7s ease-in-out;
     filter: drop-shadow(0 12px 15px rgba(0, 0, 0, 0.85));
@@ -66,8 +62,14 @@
     pointer-events: none;
   }
 
+  /* Each image has different padding, so these sizes/offsets line the
+     chests up exactly on top of each other (no "double chest" while fading) */
+  #layerClosed { width: 301px; left: -14.5px; top: 72.6px; }
+  #layerOpen   { width: 311.9px; left: -12.9px; top: -2.5px; }
+  #layerGlow   { width: 326.1px; left: -28.6px; top: -23.9px; }
+
   .chest-layer.show { opacity: 1; }
-  #layerGlow { transition-duration: 1s; }
+  #layerGlow { transition-duration: 0.8s; }
 
   /* Soft golden light that fades in when the chest is fully open */
   .chest-glow {
@@ -367,6 +369,8 @@
     setTimeout(() => {
       layerGlow.classList.add('show');
       chestGlow.classList.add('show');
+      // once the glowing chest is fully visible, remove the plain open chest underneath
+      setTimeout(() => layerOpen.classList.remove('show'), 900);
     }, 1100);
 
     // 4) scroll rises out of the chest
